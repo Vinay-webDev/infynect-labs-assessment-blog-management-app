@@ -37,9 +37,9 @@ export default function Navbar() {
       {/* Right - Nav Links */}
       <div className="flex gap-6 items-center text-sm">
         <Link
-          href="/home"
+          href="/"
           className={`hover:text-blue-400 transition ${
-            pathname === "/home" ? "text-blue-400" : ""
+            pathname === "/" ? "text-blue-400" : ""
           }`}
         >
           Home

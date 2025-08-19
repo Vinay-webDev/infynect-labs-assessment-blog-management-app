@@ -31,7 +31,38 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 ///////////////////////////////////////////////////////////////////
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", async (req, res) => {
+  try {
+    const { q, status, category, page = 1, limit = 6 } = req.query;
+    const where = {};
+
+    if (status) where.status = status;
+    if (category) where.category = category;
+    if (q) {
+      where[Op.or] = [
+        { post_title: { [Op.iLike]: `%${q}%` } },
+        { content: { [Op.iLike]: `%${q}%` } },
+      ];
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const posts = await Post.findAll({
+      attributes: ["post_id", "post_title", "category", "status", "created_date"],
+      where,
+      order: [["created_date", "DESC"]],
+      limit: parseInt(limit),
+      offset,
+    });
+
+    return res.json(posts);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+////////////////////////////////////////////////////////////
+router.get("/my-blogs", verifyToken, async (req, res) => {
   try {
     const { q, status, category } = req.query;
     const where = { user_id: req.user.user_id };
@@ -141,3 +172,6 @@ router.get("/export.csv", verifyToken, async (req, res) => {
 });
 
 export default router;
+
+
+

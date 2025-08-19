@@ -1,25 +1,35 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { fetchBlogs } from "../lib/fetchBlogs";
 import { FaRegThumbsUp, FaCommentAlt } from "react-icons/fa";
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "";
+
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [query, setQuery] = useState("");
-  const [searching, setSearching] = useState(false);
 
-  const getMorePosts = async () => {
+  useEffect(() => {
+    setPosts([]);
+    setPage(1);
+    setHasMore(true);
+    loadPosts(1, true);
+  }, [query]);
+
+
+  const loadPosts = async (pageNum = page, reset = false) => {
     try {
-      const newPosts = await fetchBlogs({ pageParam: page, q: query });
+      const newPosts = await fetchBlogs({ pageParam: pageNum, query });
       if (newPosts.length === 0) {
         setHasMore(false);
       } else {
-        setPosts(prev => [...prev, ...newPosts]);
-        setPage(prev => prev + 1);
+        setPosts((prev) => (reset ? newPosts : [...prev, ...newPosts]));
+        setPage((prev) => prev + 1);
       }
     } catch (err) {
       console.error("Error fetching posts:", err);
@@ -27,49 +37,13 @@ export default function HomePage() {
     }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setSearching(true);
-    try {
-      const newPosts = await fetchBlogs({ pageParam: 1, q: query });
-      setPosts(newPosts);
-      setPage(2);
-      setHasMore(newPosts.length > 0);
-    } catch (err) {
-      console.error("Search failed:", err);
-    }
-    setSearching(false);
-  };
-
-  useEffect(() => {
-    getMorePosts();
-  }, []);
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 text-white">
       <h1 className="text-3xl font-bold text-center mb-6">Feed</h1>
 
-      {/* Search Bar */}
-      {/* <form onSubmit={handleSearch} className="mb-8 flex justify-center">
-        <input
-          type="text"
-          placeholder="Search posts by title or content..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="bg-zinc-800 text-white px-4 py-2 rounded-l-md w-full max-w-md focus:outline-none focus:ring focus:ring-blue-400"
-        />
-        <button
-          type="submit"
-          disabled={searching}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r-md"
-        >
-          {searching ? "Searching..." : "Search"}
-        </button>
-      </form> */}
-
       <InfiniteScroll
         dataLength={posts.length}
-        next={getMorePosts}
+        next={() => loadPosts()}
         hasMore={hasMore}
         loader={<p className="text-center my-6">Loading...</p>}
         endMessage={<p className="text-center text-gray-500 my-6">No more posts</p>}
@@ -77,7 +51,7 @@ export default function HomePage() {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {posts.map((post) => (
             <div
-              key={post.user_name}
+              key={post.post_id}
               className="bg-zinc-900 rounded-xl shadow hover:shadow-lg transition-all p-5 flex flex-col justify-between"
             >
               <div>
@@ -100,5 +74,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-

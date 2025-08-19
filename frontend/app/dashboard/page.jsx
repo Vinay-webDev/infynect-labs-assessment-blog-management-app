@@ -5,7 +5,7 @@ import Link from "next/link";
 import api from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 
-// Heroicons
+
 import { PlusIcon, EyeIcon, PencilSquareIcon, TagIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
@@ -14,7 +14,7 @@ export default function Dashboard() {
 
   const fetchPosts = async () => {
     try {
-      const res = await api.get("/blogs");
+      const res = await api.get("/blogs/my-blogs");
       setPosts(res.data);
     } catch (err) {
       console.error("Error fetching posts");

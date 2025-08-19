@@ -24,6 +24,10 @@ User.init(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    profile_pic: {
+      type: DataTypes.BLOB("long"),
+      allowNull: true,
+    },
   },
   {
     sequelize,
