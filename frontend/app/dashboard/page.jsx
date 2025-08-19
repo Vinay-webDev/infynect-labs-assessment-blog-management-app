@@ -5,7 +5,15 @@ import Link from "next/link";
 import api from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 
-import { PlusIcon, EyeIcon, PencilSquareIcon, TagIcon, ArrowRightOnRectangleIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  EyeIcon,
+  PencilSquareIcon,
+  TagIcon,
+  ArrowRightOnRectangleIcon,
+  ArrowDownTrayIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -39,6 +47,17 @@ export default function Dashboard() {
       link.remove();
     } catch (err) {
       console.error("Error exporting CSV", err);
+    }
+  };
+
+  const handleDelete = async (post_id) => {
+    if (!confirm("Are you sure you want to delete this post?")) return;
+    try {
+      await api.delete(`/blogs/${post_id}`);
+      setPosts((prev) => prev.filter((p) => p.post_id !== post_id));
+    } catch (err) {
+      console.error("Error deleting post", err);
+      alert("Failed to delete post.");
     }
   };
 
@@ -117,6 +136,13 @@ export default function Dashboard() {
                   <PencilSquareIcon className="h-4 w-4" />
                   Edit
                 </Link>
+                <button
+                  onClick={() => handleDelete(post.post_id)}
+                  className="flex items-center gap-1 text-red-400 hover:underline"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                  Delete
+                </button>
               </div>
             </div>
           ))}
