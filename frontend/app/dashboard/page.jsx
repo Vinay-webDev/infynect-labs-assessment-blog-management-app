@@ -5,8 +5,7 @@ import Link from "next/link";
 import api from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 
-
-import { PlusIcon, EyeIcon, PencilSquareIcon, TagIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, EyeIcon, PencilSquareIcon, TagIcon, ArrowRightOnRectangleIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -25,6 +24,24 @@ export default function Dashboard() {
     fetchPosts();
   }, []);
 
+  const exportCSV = async () => {
+    try {
+      const res = await api.get("/blogs/export.csv", {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "blog_posts.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Error exporting CSV", err);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 text-gray-100 bg-gray-900 min-h-screen">
       {/* Header */}
@@ -38,6 +55,15 @@ export default function Dashboard() {
             <PlusIcon className="h-5 w-5" />
             New Post
           </Link>
+
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full text-sm font-medium transition"
+          >
+            <ArrowDownTrayIcon className="h-5 w-5" />
+            Export CSV
+          </button>
+
           <button
             onClick={logout}
             className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-full text-sm font-medium transition"

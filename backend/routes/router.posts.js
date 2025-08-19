@@ -88,6 +88,31 @@ router.get("/my-blogs", verifyToken, async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+///////////////////////////////////////////////////////////////////////////////
+router.get("/export.csv", verifyToken, async (req, res) => {
+  try {
+    const posts = await Post.findAll({
+      attributes: ["post_id", "post_title", "category", "status", "created_date"],
+      where: { user_id: req.user.user_id },
+      order: [["created_date", "DESC"]],
+      raw: true,
+    });
+
+    const parser = new Parser({
+      fields: ["post_id", "post_title", "category", "status", "created_date"],
+    });
+    const csv = parser.parse(posts);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("blog_posts.csv");
+    return res.send(csv);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+export default router;
 
 ///////////////////////////////////////////////////////////////////////////
 router.get("/:id", verifyToken, async (req, res) => {
@@ -148,30 +173,6 @@ router.delete("/:id", verifyToken, async (req, res) => {
 });
 
 /////////////////////////////////////////////////////////////////////////
-router.get("/export.csv", verifyToken, async (req, res) => {
-  try {
-    const posts = await Post.findAll({
-      attributes: ["post_id", "post_title", "category", "status", "created_date"],
-      where: { user_id: req.user.user_id },
-      order: [["created_date", "DESC"]],
-      raw: true,
-    });
-
-    const parser = new Parser({
-      fields: ["post_id", "post_title", "category", "status", "created_date"],
-    });
-    const csv = parser.parse(posts);
-
-    res.header("Content-Type", "text/csv");
-    res.attachment("blog_posts.csv");
-    return res.send(csv);
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
-export default router;
 
 
 
