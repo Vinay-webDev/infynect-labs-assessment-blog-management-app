@@ -35,6 +35,8 @@
 ### Import schema
 ```bash
 psql -U postgres -d blog_management -f schema.sql
+   ```sql
+   CREATE DATABASE blog_management;
 
 ## Update .env file in both frontend and backend projects with your own credentials:
 
@@ -56,6 +58,3 @@ Frontend
 cd frontend
 npm install
 npm run dev
-
-   ```sql
-   CREATE DATABASE blog_management;
