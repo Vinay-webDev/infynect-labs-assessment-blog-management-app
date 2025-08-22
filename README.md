@@ -27,15 +27,3 @@
 - **Responsive UI**
   - Built with Next.js + TailwindCSS
 
----
-
-## 🗄️ Database Setup
-
-1. Install PostgreSQL (v17 recommended).
-
-2. Create a new database:
-```sql
-CREATE DATABASE blog_management;
-
----
-
