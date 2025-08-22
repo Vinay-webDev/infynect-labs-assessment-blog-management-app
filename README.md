@@ -37,3 +37,5 @@
 ```sql
 CREATE DATABASE blog_management;
 
+---
+
